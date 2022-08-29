@@ -1,6 +1,6 @@
-from api.models import Recipe
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from .models import Subscribe, User
 
@@ -52,13 +52,6 @@ class CustomUserSerializer(UserSerializer):
         return Subscribe.objects.filter(user=user, author=obj.id).exists()
 
 
-class ShortRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-
-
 class SubscribeSerializer(CustomUserSerializer):
 
     recipes = serializers.SerializerMethodField(read_only=True)
@@ -74,9 +67,38 @@ class SubscribeSerializer(CustomUserSerializer):
         return obj.recipes.count()
 
     def get_recipes(self, obj):
+        from api.serializers import ShortRecipeSerializer
         request = self.context.get('request')
         recipes = obj.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit:
             recipes = recipes[:int(recipes_limit)]
         return ShortRecipeSerializer(recipes, many=True).data
+
+    def validate(self, data):
+        request = self.context.get('request')
+        author_id = data['author'].id
+        follow_exists = Subscribe.objects.filter(
+            user=request.user,
+            author__id=author_id
+        ).exists()
+
+        if request.method == 'GET':
+            if request.user.id == author_id:
+                raise serializers.ValidationError(
+                    'Нельзя подписаться на себя'
+                )
+            if follow_exists:
+                raise serializers.ValidationError(
+                    'Вы уже подписаны на этого пользователя'
+                )
+
+        return data
+
+    @staticmethod
+    def validate_user_subscription(subscription):
+        if not subscription:
+            return Response(
+                {'error': 'Вы не подписаны на пользователя'},
+                status=status.HTTP_400_BAD_REQUEST
+            )

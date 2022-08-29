@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Subscribe, User
-from .pagination import LimitFieldPagination
+from commom.pagination import LimitFieldPagination
 from .serializers import CustomUserSerializer, SubscribeSerializer
 
 
@@ -20,6 +20,7 @@ class CustomUserViewSet(UserViewSet):
 
 class SubscribeView(APIView):
 
+    queryset = Subscribe.objects.all()
     serializer_class = SubscribeSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = LimitFieldPagination

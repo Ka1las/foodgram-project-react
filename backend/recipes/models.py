@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -10,7 +11,7 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         'Единицы измерения',
-        max_length=200,
+        max_length=20,
     )
 
     class Meta:
@@ -29,7 +30,7 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     name = models.CharField(
         'Название тега',
-        max_length=200,
+        max_length=20,
     )
     color = models.CharField(
         'Цвет',
@@ -38,7 +39,7 @@ class Tag(models.Model):
     slug = models.SlugField(
         'Адрес',
         unique=True,
-        max_length=200,
+        max_length=20,
     )
 
     class Meta:
@@ -115,7 +116,7 @@ class IngredientAmount(models.Model):
         'Количество ингредиента',
         validators=(
             MinValueValidator(
-                1, message='Количество не может быть меньше 1'),),
+                1, message='Минимальное значение'),),
     )
 
     class Meta:
@@ -127,6 +128,9 @@ class IngredientAmount(models.Model):
                 name='unique ingredient amount',
             ),
         )
+
+    def __str__(self):
+        return f'{self.ingredient.name} -> {self.recipe.name}'
 
 
 class Favorite(models.Model):
@@ -151,6 +155,9 @@ class Favorite(models.Model):
                                     name='unique favorite')
         ]
 
+    def __str__(self):
+        return f'{self.user.username} -> {self.recipe.name}'
+
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
@@ -168,8 +175,11 @@ class ShoppingCart(models.Model):
 
     class Meta:
         verbose_name = 'Корзина'
-        verbose_name_plural = 'Корзина'
+        verbose_name_plural = 'Корзины'
         constraints = [
             models.UniqueConstraint(fields=['user', 'recipe'],
                                     name='unique shopping cart')
         ]
+
+    def __str__(self):
+        return f'{self.user.username} -> {self.recipe.name}'
