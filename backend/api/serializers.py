@@ -47,7 +47,9 @@ class RecipeListSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id', 'author', 'ingredients', 'tags', 'image',
-            'name', 'text', 'cooking_time')
+            'name', 'text', 'cooking_time', 'is_favorited',
+            'is_in_shopping_cart'
+            )
 
     def get_ingredients(self, obj):
         queryset = IngredientAmount.objects.filter(recipe=obj)
@@ -129,11 +131,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def create_ingredients(ingredients, recipe):
+        bulk = []
         for ingredient in ingredients:
-            IngredientAmount.objects.bulk_create(
-                recipe=recipe, ingredient=ingredient['id'],
-                amount=ingredient['amount']
-            )
+            bulk.append(IngredientAmount(
+                ingredient=ingredient['id'],
+                recipe=recipe,
+                amount=ingredient['amount'],
+            ))
+        IngredientAmount.objects.bulk_create(bulk)
 
     @staticmethod
     def create_tags(tags, recipe):

@@ -75,30 +75,36 @@ class SubscribeSerializer(CustomUserSerializer):
             recipes = recipes[:int(recipes_limit)]
         return ShortRecipeSerializer(recipes, many=True).data
 
+
+class SubscribingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subscribe
+        fields = ('user', 'author')
+
     def validate(self, data):
         request = self.context.get('request')
-        author_id = data['author'].id
-        follow_exists = Subscribe.objects.filter(
-            user=request.user,
-            author__id=author_id
-        ).exists()
-
-        if request.method == 'GET':
-            if request.user.id == author_id:
-                raise serializers.ValidationError(
-                    'Нельзя подписаться на себя'
-                )
-            if follow_exists:
-                raise serializers.ValidationError(
-                    'Вы уже подписаны на этого пользователя'
-                )
-
+        author_id = data['author']
+        user_id = data['user']
+        subscription = Subscribe.objects.filter(user=request.user, author=author_id)
+        if self.context.get('request').method == 'POST':
+            if user_id == author_id:
+                raise serializers.ValidationError({
+                    'errors': 'Вы не можете подписаться на самого себя!'
+                })
+            elif subscription.exists():
+                raise serializers.ValidationError({
+                    'errors': 'Вы уже подписаны на пользователя'
+                })
+        elif not subscription.exists():
+            raise serializers.ValidationError({
+                'errors': 'Вы не подписаны на пользователя'
+            })
         return data
 
-    @staticmethod
-    def validate_user_subscription(subscription):
-        if not subscription:
-            return Response(
-                {'error': 'Вы не подписаны на пользователя'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    def to_representation(self, instance):
+        return SubscribeSerializer(
+            instance.author,
+            context={'request': self.context.get('request')}
+        ).data
+   

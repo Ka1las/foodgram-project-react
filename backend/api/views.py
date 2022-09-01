@@ -18,6 +18,7 @@ from .permissions import IsAuthorOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeListSerializer, RecipeSerializer,
                           ShoppingCartSerializer, TagSerializer)
+from .utils import get_download
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
@@ -93,27 +94,13 @@ class RecipeViewSet(ModelViewSet):
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         cur_user = request.user
-        shop_list = {}
         ingredients = IngredientAmount.objects.filter(
             recipe__carts__user=cur_user
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(Sum('amount'))
-        for ingredient in ingredients:
-            amount = ingredient['amount__sum']
-            name = ingredient['ingredient__name']
-            measurement_unit = ingredient['ingredient__measurement_unit']
-            shop_list[name] = {
-                'amount': amount,
-                'measurement_unit': measurement_unit
-            }
-        out_list = ['Project\n\n']
-        for ingr, value in shop_list.items():
-            out_list.append(
-                f" {ingr} - {value['amount']} "
-                f"{value['measurement_unit']}\n"
-            )
+        out_list = get_download(ingredients)
         response = HttpResponse(out_list, {
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment; filename="out_list.txt"',
