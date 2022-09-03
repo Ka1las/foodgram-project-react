@@ -1,6 +1,5 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 
 from .models import Subscribe, User
 
@@ -67,7 +66,7 @@ class SubscribeSerializer(CustomUserSerializer):
         return obj.recipes.count()
 
     def get_recipes(self, obj):
-        from api.serializers import ShortRecipeSerializer
+        from recipes.serializers import ShortRecipeSerializer
         request = self.context.get('request')
         recipes = obj.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
@@ -86,7 +85,9 @@ class SubscribingSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         author_id = data['author']
         user_id = data['user']
-        subscription = Subscribe.objects.filter(user=request.user, author=author_id)
+        subscription = Subscribe.objects.filter(
+            user=request.user, author=author_id
+            )
         if self.context.get('request').method == 'POST':
             if user_id == author_id:
                 raise serializers.ValidationError({

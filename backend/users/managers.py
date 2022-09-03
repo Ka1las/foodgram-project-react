@@ -14,7 +14,7 @@ class CustomUserManager(BaseUserManager):
         if not other_fields.get('is_staff'):
             raise ValueError('Отказано в доступе')
 
-        if not other_fields.get("is_superuser"):
+        if not other_fields.get('is_superuser'):
             raise ValueError('Отказано в доступе')
 
         return self.create_user(

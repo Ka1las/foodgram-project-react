@@ -1,9 +1,24 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                            ShoppingCart, Tag)
+from recipes.models import (
+    Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
+)
 from users.serializers import CustomUserSerializer
+
+
+class RepresentationMixin:
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        if isinstance(instance, Recipe):
+            return RecipeListSerializer(instance, context=context).data
+        elif isinstance(instance, Favorite) or isinstance(
+            instance, ShoppingCart
+        ):
+            return ShortRecipeSerializer(instance.recipe, context=context).data
+        else:
+            raise Exception('Не ожидаемый тип объекта')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -79,7 +94,7 @@ class AddIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount')
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeSerializer(RepresentationMixin, serializers.ModelSerializer):
 
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
@@ -130,7 +145,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return data
 
     @staticmethod
-    def create_ingredients(ingredients, recipe):
+    def __create_ingredients(ingredients, recipe):
         bulk = []
         for ingredient in ingredients:
             bulk.append(IngredientAmount(
@@ -141,7 +156,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         IngredientAmount.objects.bulk_create(bulk)
 
     @staticmethod
-    def create_tags(tags, recipe):
+    def __create_tags(tags, recipe):
         for tag in tags:
             recipe.tags.add(tag)
 
@@ -150,20 +165,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=author, **validated_data)
-        self.create_tags(tags, recipe)
-        self.create_ingredients(ingredients, recipe)
+        self.__create_tags(tags, recipe)
+        self.__create_ingredients(ingredients, recipe)
         return recipe
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return RecipeListSerializer(instance, context=context).data
 
     def update(self, instance, validated_data):
         instance.tags.clear()
         IngredientAmount.objects.filter(recipe=instance).delete()
-        self.create_tags(validated_data.pop('tags'), instance)
-        self.create_ingredients(validated_data.pop('ingredients'), instance)
+        self.__create_tags(validated_data.pop('tags'), instance)
+        self.__create_ingredients(validated_data.pop('ingredients'), instance)
         return super().update(instance, validated_data)
 
 
@@ -174,7 +184,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(RepresentationMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
@@ -191,21 +201,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
             })
         return data
 
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return ShortRecipeSerializer(
-            instance.recipe, context=context).data
 
-
-class ShoppingCartSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(RepresentationMixin, serializers.ModelSerializer):
 
     class Meta:
         model = ShoppingCart
         fields = ('user', 'recipe')
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return ShortRecipeSerializer(
-            instance.recipe, context=context).data

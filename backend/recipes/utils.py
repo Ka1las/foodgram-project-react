@@ -1,4 +1,4 @@
-def get_download(ingredients):
+def get_ingredients_for_shopping(ingredients):
     shop_list = {}
     for ingredient in ingredients:
         amount = ingredient['amount__sum']
@@ -8,7 +8,7 @@ def get_download(ingredients):
             'amount': amount,
             'measurement_unit': measurement_unit
         }
-    out_list = ['Project\n\n']
+    out_list = ['Foodgram\n\n']
     for ingr, value in shop_list.items():
         out_list.append(
             f" {ingr} - {value['amount']} "
