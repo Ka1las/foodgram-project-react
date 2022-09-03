@@ -10,12 +10,12 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from common.pagination import LimitFieldPagination
 from recipes.models import (
-    Ingredient, IngredientAmount, Favorite, Recipe, ShoppingCart, Tag
+    Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
 )
 from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
-    IngredientSerializer, FavoriteSerializer, RecipeListSerializer,
+    FavoriteSerializer, IngredientSerializer, RecipeListSerializer,
     RecipeSerializer, ShoppingCartSerializer, TagSerializer
 )
 from .utils import get_ingredients_for_shopping
