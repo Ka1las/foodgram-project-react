@@ -1,24 +1,11 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import (
+from users.serializers import CustomUserSerializer
+from .mixins import RepresentationMixin
+from .models import (
     Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
 )
-from users.serializers import CustomUserSerializer
-
-
-class RepresentationMixin:
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        if isinstance(instance, Recipe):
-            return RecipeListSerializer(instance, context=context).data
-        elif isinstance(instance, Favorite) or isinstance(
-            instance, ShoppingCart
-        ):
-            return ShortRecipeSerializer(instance.recipe, context=context).data
-        else:
-            raise Exception('Не ожидаемый тип объекта')
 
 
 class TagSerializer(serializers.ModelSerializer):

@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from common.pagination import LimitFieldPagination
-from recipes.models import (
+from .filters import IngredientSearchFilter, RecipeFilter
+from .models import (
     Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
 )
-from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     FavoriteSerializer, IngredientSerializer, RecipeListSerializer,
