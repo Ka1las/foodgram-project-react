@@ -1,3 +1,4 @@
+from common.pagination import LimitFieldPagination
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
@@ -5,11 +6,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from common.pagination import LimitFieldPagination
 from .models import Subscribe, User
-from .serializers import (
-    CustomUserSerializer, SubscribeSerializer, SubscribingSerializer
-)
+from .serializers import (CustomUserSerializer, SubscribeSerializer,
+                          SubscribingSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -27,7 +26,7 @@ class CustomUserViewSet(UserViewSet):
         data = {'user': request.user.id, 'author': id}
         serializer = SubscribingSerializer(
             data=data, context={'request': request}
-            )
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

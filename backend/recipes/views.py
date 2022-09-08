@@ -1,3 +1,4 @@
+from common.pagination import LimitFieldPagination
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -8,16 +9,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from common.pagination import LimitFieldPagination
 from .filters import IngredientSearchFilter, RecipeFilter
-from .models import (
-    Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
-)
+from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (
-    FavoriteSerializer, IngredientSerializer, RecipeListSerializer,
-    RecipeSerializer, ShoppingCartSerializer, TagSerializer
-)
+from .serializers import (FavoriteSerializer, IngredientSerializer,
+                          RecipeListSerializer, RecipeSerializer,
+                          ShoppingCartSerializer, TagSerializer)
 from .utils import get_ingredients_for_shopping
 
 
@@ -99,8 +97,7 @@ class RecipeViewSet(ModelViewSet):
             'ingredient__measurement_unit'
         ).annotate(Sum('amount'))
         out_list = get_ingredients_for_shopping(ingredients)
-        response = HttpResponse(out_list, {
+        return HttpResponse(out_list, {
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment; filename="out_list.txt"',
         })
-        return response

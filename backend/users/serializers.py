@@ -87,7 +87,7 @@ class SubscribingSerializer(serializers.ModelSerializer):
         user_id = data['user']
         subscription = Subscribe.objects.filter(
             user=request.user, author=author_id
-            )
+        )
         if self.context.get('request').method == 'POST':
             if user_id == author_id:
                 raise serializers.ValidationError({
@@ -108,4 +108,3 @@ class SubscribingSerializer(serializers.ModelSerializer):
             instance.author,
             context={'request': self.context.get('request')}
         ).data
-   

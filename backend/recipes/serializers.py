@@ -1,11 +1,10 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-
 from users.serializers import CustomUserSerializer
+
 from .mixins import RepresentationMixin
-from .models import (
-    Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
-)
+from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -51,7 +50,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
             'id', 'author', 'ingredients', 'tags', 'image',
             'name', 'text', 'cooking_time', 'is_favorited',
             'is_in_shopping_cart'
-            )
+        )
 
     def get_ingredients(self, obj):
         queryset = IngredientAmount.objects.filter(recipe=obj)
