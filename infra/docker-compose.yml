@@ -1,48 +1,51 @@
 version: '3.3'
+
+volumes:
+  static_value:
+  media_value:
+  result_build:
+  postgres_data:
+  redoc:
+
+
 services:
+
   db:
-    image: postgres:13.0-alpine
+    image: postgres:12.4
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env
-  
-  web:
+
+  backend:
     image: insept17/foodgram:latest
     restart: always
     volumes:
-      - static_value:/app/backend_static/
-      - media_value:/app/backend_media/
+      - static_value:/app/static/
+      - media_value:/app/media/
+      - redoc:/app/api/docs/
     depends_on:
       - db
     env_file:
       - ./.env
-  
+
   frontend:
     image: insept17/foodgram_frontend:latest
     volumes:
-      - result_build:/app/result_build/build
-    depends_on:
-      - db
+      - result_build:/app/result_build/build/
 
   nginx:
     image: nginx:1.19.3
     ports:
       - 80:80
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - static_value:/app/backend_static/
-      - media_value:/app/backend_media/
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_value:/static/
+      - media_value:/media/
       - result_build:/usr/share/nginx/html/
-      - ./docs:/usr/share/nginx/html/api/docs
-    depends_on: 
-      - web
+      - redoc:/usr/share/nginx/html/api/docs/
+    depends_on:
+      - backend
       - frontend
     env_file:
       - ./.env
-
-volumes:
-  static_value:  
-  media_value:
-  result_build:
-  postgres_data: 
