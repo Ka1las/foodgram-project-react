@@ -43,14 +43,9 @@ services:
       - static_value:/app/backend_static/
       - media_value:/app/backend_media/
       - result_build:/usr/share/nginx/html/
-      - redoc:/usr/share/nginx/html/api/docs/ # - ../docs:/usr/share/nginx/html/api/docs/
+      - redoc:/usr/share/nginx/html/api/docs/
     depends_on:
       - backend
       - frontend
     env_file:
       - ./.env
-
-      # Удалить куки браузера 
-      # создать теги
-      # сделать редок
-      # Проверить статику (загрузить на сервак)
