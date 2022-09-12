@@ -93,9 +93,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-Ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -104,12 +104,12 @@ USE_L10N = True
 USE_TZ = True
 
 
-STATIC_URL = '/backend_static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "backend_static")
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
-MEDIA_URL = '/backend_media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'backend_media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
