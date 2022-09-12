@@ -19,9 +19,8 @@ services:
     image: insept17/foodgram:latest
     restart: always
     volumes:
-      - static_value:/app/backend_static/
-      - media_value:/app/backend_media/
-      - redoc:/app/api/docs/
+      - static_value:/app/static/
+      - media_value:/app/media/
     depends_on:
       - db
     env_file:
