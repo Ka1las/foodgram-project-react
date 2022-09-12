@@ -22,6 +22,7 @@ from .utils import get_ingredients_for_shopping
 class TagsViewSet(ReadOnlyModelViewSet):
 
     queryset = Tag.objects.all()
+    pagination_class = None
     permission_classes = (AllowAny,)
     serializer_class = TagSerializer
 
@@ -29,6 +30,7 @@ class TagsViewSet(ReadOnlyModelViewSet):
 class IngredientsViewSet(ReadOnlyModelViewSet):
 
     queryset = Ingredient.objects.all()
+    pagination_class = None
     permission_classes = (AllowAny, )
     serializer_class = IngredientSerializer
     filter_backends = [IngredientSearchFilter]
