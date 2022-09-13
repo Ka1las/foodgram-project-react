@@ -50,6 +50,7 @@ python3 manage.py runserver
 ## Запуск проекта в Docker контейнере
 
 Установите Docker
+
 Запустите docker compose:
 ```
 sudo docker-compose up -d --build
@@ -85,7 +86,7 @@ sudo docker-compose exec backend python manage.py collectstatic --noinput
 
 ### Тестовый суперюзер
 Логин: insept@gmail.com
-ПАроль: Kailas11
+Пароль: Kailas11
 
 ## Шаблон наполнения env-файла:
 
