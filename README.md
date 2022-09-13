@@ -1,4 +1,4 @@
-# foodgram-projecr-react
+# foodgram-project-react
 ![example workflow](https://github.com/Ka1las/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg) адрес http://84.201.153.205/recipes
 ## Описание проекта
 Foodgram это ресурс для публикации рецептов.
